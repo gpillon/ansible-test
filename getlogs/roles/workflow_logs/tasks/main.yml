@@ -1,0 +1,72 @@
+---
+- name: Verificare lo stato del workflow
+  uri:
+    url: "{{ aap_url }}/api/v2/workflow_jobs/{{ workflow_id }}/"
+    method: GET
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: yes
+    validate_certs: no
+    return_content: yes
+  register: workflow_status
+  until: workflow_status.json.status in ["successful", "failed", "error", "canceled"]
+  retries: 180  
+  delay: 5 
+
+- name: Ottenere i dettagli dei nodi del workflow tramite ID usando l'autenticazione di base
+  uri:
+    url: "{{ aap_url }}/api/v2/workflow_jobs/{{ workflow_id }}/workflow_nodes/"
+    method: GET
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: yes
+    validate_certs: no
+    return_content: yes
+  register: workflow_nodes
+
+- name: Ottenere dettagli specifici del job per ogni nodo del workflow
+  uri:
+    url: "{{ aap_url }}{{ item.related.job }}"
+    method: GET
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: yes
+    validate_certs: no
+    return_content: yes
+  register: job_details
+  loop: "{{ workflow_nodes.json.results }}"
+  when: "'job' in item.related"
+
+- name: Ottenere i log di stdout per ogni job
+  uri:
+    url: "{{ aap_url }}{{ item.json.related.stdout }}?format=txt_download"
+    method: GET
+    user: "{{ aap_username }}"
+    password: "{{ aap_password }}"
+    force_basic_auth: yes
+    validate_certs: no
+    return_content: yes
+  register: stdout_logs
+  loop: "{{ job_details.results }}"
+  when: "'stdout' in item.json.related"
+  no_log: false
+
+- name: Raccogliere i dettagli dei job per la scrittura
+  set_fact:
+    job_info: "{{ job_info | default([]) + [{ 'job_id': item.item.json.id, 'result': item.item.json.status, 'vars': item.item.json.extra_vars, 'stdout': item.content | default('Log non disponibile') }] }}"
+  loop: "{{ stdout_logs.results }}"
+  when: item.content is defined
+
+- name: Scrivere i dettagli dei job in un file locale
+  copy:
+    dest: "./workflow_details_{{ workflow_id }}.txt"
+    content: |
+      {% for job in job_info %}
+      @~~~~~~~~~~~~~~~~~~~~~~~~~~~~~@
+      | job_id: {{ job.job_id }} 
+      @~~~~~~~~~~~~~~~~~~~~~~~~~~~~~@
+      result: {{ job.result }}
+      vars: {{ job.vars }}
+      stdout: {{ job.stdout }}
+      
+      {% endfor %}

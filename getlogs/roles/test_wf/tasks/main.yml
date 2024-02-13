@@ -1,0 +1,44 @@
+---
+- name: Fai tutte cose
+  block:
+  - name: Get Pet by ID
+    uri:
+      url: https://petstore.swagger.io/v2/pet/{{ pet_id }}
+      method: GET
+      return_content: yes
+      status_code: 200
+      headers:
+        Accept: application/json
+    register: pet_response
+    failed_when: pet_response.status != 200
+
+  - name: Process Pet
+    debug:
+      msg: "Pet: {{ pet_response.json }}"
+    when: pet_response.status == 200
+  
+  - name: Set Pet Response in Artifats
+    set_stats:
+      data:
+        pet_response: "{{ pet_response }}"
+        banane: "Banane"
+
+  rescue:
+    - name: Handle Error Daje
+      debug:
+        msg: "Mando il Tickeet per: {{ ansible_failed_task.name }}, error: {{pet_response.msg}}"
+      changed_when: True
+      notify: Error Handler Service Now
+    - name: Handle Error
+      fail:
+        msg: "Playbook esploso per: to get pet with ID {{ pet_id }}. Error: {{ pet_response.msg }}"
+  when: pet_response is not defined
+
+- name: Fai Altre cose
+  debug:
+    msg: "Faccio altre cose con {{pet_response.json}}" 
+
+- name: Fai Altre cose
+  debug:
+    msg: "Faccio altre cose con {{pet_response.json}}" 
+    

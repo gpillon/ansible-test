@@ -1,0 +1,18 @@
+---
+# This is an example playbook to prepare Molecule environment
+
+# - name: Prepare
+#   hosts: all
+#   gather_facts: false
+
+- name: Prepare
+  hosts: workflow_logs_mock_server
+  gather_facts: false
+  tasks:
+  - name: Copy workflow.json File
+    copy:
+      src: test_data/workflow.json
+      dest: /app/mocks/
+
+
+# qui me devo fa il server de node

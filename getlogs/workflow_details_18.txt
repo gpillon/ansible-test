@@ -1,0 +1,40 @@
+@~~~~~~~~~~~~~~~~~~~~~~~~~~~~~@
+| job_id: 19 
+@~~~~~~~~~~~~~~~~~~~~~~~~~~~~~@
+result: successful
+vars: {}
+stdout: 
+PLAY [Hello World Sample] ******************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Hello Message] ***********************************************************
+ok: [localhost] => {
+    "msg": "Hello World!"
+}
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+
+@~~~~~~~~~~~~~~~~~~~~~~~~~~~~~@
+| job_id: 20 
+@~~~~~~~~~~~~~~~~~~~~~~~~~~~~~@
+result: successful
+vars: {}
+stdout: 
+PLAY [Hello World Sample] ******************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Hello Message] ***********************************************************
+ok: [localhost] => {
+    "msg": "Hello World!"
+}
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+

@@ -1,0 +1,56 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: podman
+# Podman Driver is predefined. DO NOT Change to Docker. Keep Using PODMAN.
+platforms:
+  - name: test_wf
+    dockerfile: Dockerfile
+# Feel free to define a specific Dockerfile. If use multi-pod approach this is necessary to avoid pods having the same config
+    image: registry.access.redhat.com/ubi8/ubi-init:8.8-10
+# This is a predefined image, can use other images based on project requirements.
+    command: "/usr/sbin/init"
+    privileged: false
+#    network: mynetwork
+#    network_mode: "mynetwork"
+    tmpfs:
+      - /run
+      - /tmp
+
+# Uncomment network and network_mode to activate a specific podman network.
+# if use the same network for all containers, this will establish communication among them. 
+# Using different networks is preferable to test playbook consistency in dfferent environment (eg. Fedora / Ubuntu etc).
+
+# Uncomment the following lines to activate a new docker container
+#  - name: test_wf
+#    dockerfile: Dockerfile
+#    image: registry.access.redhat.com/ubi8/ubi-init:8.8-10
+#    command: "/usr/sbin/init"
+#    privileged: false
+#    network: mynetwork
+#    network_mode: "mynetwork"
+#    tmpfs:
+#      - /run
+#      - /tmp
+
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      callbacks_enabled: ansible.posix.profile_tasks
+# Tracing has been enabled by default.
+  options:
+    vvv: true
+  lint:
+    name: ansible-lint
+    enabled: true
+
+scenario:
+  name: default
+  test_sequence:
+    - create
+    - prepare
+    - converge
+    - verify
+    - destroy

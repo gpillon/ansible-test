@@ -1,0 +1,7 @@
+---
+- name: Error Handler Service Now
+  debug:
+    msg: "Send Ticket To Service NOW : {{ ansible_failed_task }}"
+- name: Error Handler Email
+  debug:
+    msg: "Send Ticket Email: {{ ansible_failed_task }}"   

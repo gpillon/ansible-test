@@ -1,0 +1,15 @@
+---
+- name: Ottenere i log del workflow
+  hosts: localhost
+  gather_facts: no
+  connection: local
+  roles:
+    - workflow_logs
+  vars_prompt:
+    - name: "workflow_id"
+      prompt: "Inserisci l'ID del workflow"
+      private: no
+  vars:
+    aap_url: "https://aap-controller-aap.apps.ocp4.vm.lan2"
+    aap_username: admin
+    aap_password: zeJ4YgwGDwGyDLAQ0RXWkpP17YAsnUPt

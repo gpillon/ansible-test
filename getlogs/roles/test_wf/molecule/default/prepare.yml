@@ -1,0 +1,6 @@
+---
+# This is an example playbook to prepare Molecule environment
+
+- name: Prepare
+  hosts: all
+  gather_facts: false

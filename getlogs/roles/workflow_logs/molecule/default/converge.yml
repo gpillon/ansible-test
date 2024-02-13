@@ -1,0 +1,13 @@
+---
+- name: Converge
+  hosts: workflow_logs
+  gather_facts: false
+  tasks:
+    - name: "Include workflow_logs"
+      ansible.builtin.include_role:
+        name: "workflow_logs"
+      vars:
+        aap_url: workflow_logs_mock_server:3030
+        aap_username: admin
+        aap_password: fake
+        workflow_id: 12

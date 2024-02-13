@@ -1,0 +1,9 @@
+---
+- name: Run test_wf role
+  hosts: localhost
+  gather_facts: no
+  force_handlers: True
+  connection: local
+
+  roles:
+    - test_wf

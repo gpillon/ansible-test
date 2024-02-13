@@ -1,0 +1,42 @@
+{% if item.registry is defined %}
+FROM {{ item.registry.url }}/{{ item.image }}
+{% else %}
+FROM {{ item.image }}
+{% endif %}
+
+# Usa l'immagine ufficiale di Node come base
+
+# Imposta la directory di lavoro nell'immagine
+WORKDIR /app
+
+# Installa Python3 e pip
+
+# Script del server Node.js
+RUN echo "const http = require('http'); \
+const fs = require('fs'); \
+const path = require('path'); \
+const files = fs.readdirSync('./mocks').reduce((acc, file) => { \
+  if (path.extname(file) === '.json') { \
+    const content = fs.readFileSync(path.join('./data', file)); \
+    const json = JSON.parse(content); \
+    acc[json.request.path] = json.response.body; \
+  } \
+  return acc; \
+}, {}); \
+const server = http.createServer((req, res) => { \
+  if (files[req.url]) { \
+    res.writeHead(200, {'Content-Type': 'application/json'}); \
+    res.end(JSON.stringify(files[req.url])); \
+  } else { \
+    res.writeHead(404); \
+    res.end('Not found'); \
+  } \
+}); \
+const PORT = 8080; \
+server.listen(PORT, () => console.log('Server running on port ' + PORT));" > index.js
+
+# Espone la porta 8080
+EXPOSE 8080
+
+# Comando per eseguire lo script
+CMD [ "node", "index.js" ]
